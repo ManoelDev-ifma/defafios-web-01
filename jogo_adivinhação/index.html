@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo da Adivinhação</title>
+    <style>
+      body {
+        margin: 0px;
+        font-family: Arial, sans-serif;
+        transition: background-color 0.5s ease;
+      }
+
+      .container {
+        margin: 30px auto;
+        max-width: 400px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+
+      .container h1 {
+        text-align: center;
+      }
+
+      .adivinhacao-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .adivinhacao-form input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .adivinhacao-form .botoes {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
+
+      .adivinhacao-form button {
+        padding: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .adivinhacao-form button + button {
+        background-color: #dc3545;
+      }
+
+      .status-game {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .lista-tentativas span {
+        display: inline-block;
+        margin-right: 5px;
+        margin-top: 4px;
+        padding: 5px 10px;
+        border-radius: 4px;
+      }
+
+      .lista-tentativas span.maior {
+        background-color: #87ceeb;
+      }
+
+      .lista-tentativas span.menor {
+        background-color: #ffff00;
+      }
+
+      .ganhou {
+        background-color: #28a745;
+        transition: background-color 0.5s ease;
+      }
+
+      .perdeu {
+        background-color: #dc3545;
+        transition: background-color 0.5s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Jogo da Adivinhação</h1>
+      <form class="adivinhacao-form">
+        <label for="numero">Digite um número e tente adivinhar</label>
+        <input
+          type="number"
+          id="numero"
+          name="numero"
+          min="1"
+          max="50"
+          placeholder="De 1 a 50"
+          required
+        />
+
+        <div class="botoes">
+          <button type="submit">Enviar</button>
+          <button type="reset">Novo Jogo</button>
+        </div>
+      </form>
+
+      <div class="tentativas">
+        <div class="status-game">
+          <h4>Tentativas:</h4>
+          <h4>Vidas restantes: <span class="vidas-restantes">6</span></h4>
+        </div>
+
+        <div class="lista-tentativas"></div>
+      </div>
+
+      <div class="resultado">
+        <p class="mensagem-resultado"></p>
+      </div>
+    </div>
+
+    <script>
+      let numeroScreto = Math.floor(Math.random() * 50) + 1;
+      let vidas = 6;
+      let tentativas = [];
+      const tentativasList = document.querySelector(".lista-tentativas");
+      const resultadoMensagem = document.querySelector(".mensagem-resultado");
+      const body = document.querySelector("body");
+
+      addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const palpite = document.getElementById("numero").value;
+        const palpiteNumero = Number(palpite);
+
+        console.log("Número secreto (para testes):", numeroScreto);
+        console.log("Tentativas:", tentativas);
+
+        adivinharNumero(palpite);
+      });
+
+      addEventListener("reset", (event) => {
+        numeroScreto = Math.floor(Math.random() * 50) + 1;
+        tentativas = [];
+        vidas = 6;
+        body.classList.remove("ganhou");
+        body.classList.remove("perdeu");
+        tentativasList.innerHTML = "";
+        resultadoMensagem.textContent = "";
+        document.querySelector(".vidas-restantes").textContent = vidas;
+      });
+
+      function adivinharNumero(palpite) {
+        if (vidas <= 0) {
+          resultadoMensagem.textContent =
+            "Você não tem mais vidas! Reinicie o jogo.";
+          body.classList.add("perdeu");
+          return;
+        }
+
+        if (palpite == numeroScreto) {
+          resultadoMensagem.textContent =
+            "Parabéns! Você adivinhou o número secreto!";
+          body.classList.add("ganhou");
+        } else if (palpite < numeroScreto) {
+          tentativas.push(palpite);
+          tentativasList.innerHTML += `<span class="menor">${palpite}</span>`;
+          resultadoMensagem.textContent = "Tente um número maior!";
+          vidas--;
+        } else {
+          tentativas.push(palpite);
+          tentativasList.innerHTML += `<span class="maior">${palpite}</span>`;
+          resultadoMensagem.textContent = "Tente um número menor!";
+          vidas--;
+        }
+
+        document.querySelector(".vidas-restantes").textContent = vidas;
+      }
+    </script>
+  </body>
+</html>

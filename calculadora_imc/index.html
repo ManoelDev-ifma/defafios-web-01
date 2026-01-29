@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora IMC</title>
+    <style>
+      body {
+        margin: 0px;
+        font-family: Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgb(238, 238, 238);
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: 15px;
+      }
+      form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 4px;
+        text-align: left;
+        width: 60vw;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      form input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        display: flex;
+        flex: 1;
+        box-sizing: border-box;
+      }
+
+      .botoes {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
+
+      .botoes button {
+        width: 100%;
+        flex: 1;
+      }
+
+      .btn-inserir {
+        background-color: blue;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .btn-limpar {
+        background-color: rgb(165, 165, 165);
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .registro-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 12px;
+        border-radius: 4px;
+        gap: 10px;
+      }
+
+      .registro-item .pessoa {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .registro-item .pessoa h4 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .pessoa-details {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        color: #333;
+      }
+
+      .registro-item .imc-lado {
+        text-align: right;
+      }
+
+      .registro-item .imc-lado h4 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .imc-value {
+        margin-top: 8px;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .relatorio-box {
+        background-color: rgb(101, 113, 139);
+        padding: 20px;
+        border-radius: 4px;
+        text-align: left;
+        color: white;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .relatorio-box-resultados {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .relatorio-box p {
+        margin: 10px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form>
+        <h1>Calculadora IMC</h1>
+
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required />
+
+        <label for="peso">Peso (kg):</label>
+        <input type="number" id="peso" name="peso" step="any" required />
+
+        <label for="altura">Altura (m):</label>
+        <input type="number" id="altura" name="altura" step="any" required />
+
+        <div class="botoes">
+          <button class="btn-inserir" type="submit">Inserir</button>
+          <button class="btn-limpar" type="reset">Limpar Histórico</button>
+        </div>
+      </form>
+
+      <div class="registros-box">
+        <h3>Últimos registros</h3>
+      </div>
+
+      <div class="relatorio-box">
+        <h3>Relatório de Resultados</h3>
+        <div class="relatorio-box-resultados">
+          <p>Média</p>
+          <p>Maior</p>
+          <p>Menor</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const nome = document.getElementById("nome").value;
+        const peso = parseFloat(document.getElementById("peso").value);
+        const altura = parseFloat(document.getElementById("altura").value);
+        const registrosBox = document.querySelector(".registros-box");
+        const novoRegistro = document.createElement("p");
+
+        const imc = peso / (altura * altura);
+        const imcFixed = imc.toFixed(2);
+        let classificacao = "";
+
+        if (imc < 18.5) {
+          classificacao = "Abaixo do peso";
+        } else if (imc >= 18.5 && imc < 24.9) {
+          classificacao = "Peso normal";
+        } else if (imc >= 25 && imc < 29.9) {
+          classificacao = "Sobrepeso";
+        } else {
+          classificacao = "Obesidade";
+        }
+
+        novoRegistro.innerHTML = `
+          <div class="registro-item">
+          
+          <div class="pessoa">
+            <h4>${nome}</h4>
+            <div class="pessoa-details">
+              <span>${peso}kg</span>
+              <span>${altura}m</span>
+            </div>
+          </div>
+
+          <div class="imc-lado">
+            <h4>IMC</h4>
+            <div class="imc-value">${imcFixed}</div>
+            <span>${classificacao}</span>
+        </div>   
+        `;
+        registrosBox.appendChild(novoRegistro);
+        atualizarRelatorio();
+      });
+
+      addEventListener("reset", (event) => {
+        const registrosBox = document.querySelector(".registros-box");
+        registrosBox.innerHTML = "<h3>Últimos registros</h3>";
+      });
+
+      function atualizarRelatorio() {
+        const registrosBox = document.querySelector(".registros-box");
+        const registros = registrosBox.querySelectorAll(".registro-item");
+        const relatorioBox = document.querySelector(
+          ".relatorio-box-resultados",
+        );
+
+        if (registros.length === 0) {
+          return;
+        }
+
+        let somaIMC = 0;
+        let maiorIMC = -Infinity;
+        let menorIMC = Infinity;
+
+        registros.forEach((registro) => {
+          const imcValue = parseFloat(
+            registro.querySelector(".imc-value").textContent,
+          );
+          somaIMC += imcValue;
+          if (imcValue > maiorIMC) {
+            maiorIMC = imcValue;
+          }
+          if (imcValue < menorIMC) {
+            menorIMC = imcValue;
+          }
+        });
+
+        const mediaIMC = (somaIMC / registros.length).toFixed(2);
+
+        relatorioBox.innerHTML = `
+          <p>Média: ${mediaIMC}</p>
+          <p>Maior: ${maiorIMC.toFixed(2)}</p>
+          <p>Menor: ${menorIMC.toFixed(2)}</p>
+        `;
+      }
+    </script>
+  </body>
+</html>
